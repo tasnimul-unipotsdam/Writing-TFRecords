@@ -7,7 +7,6 @@ from pprint import pprint
 
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras import layers
 from sklearn.utils import class_weight
 from tqdm import tqdm
 
@@ -80,7 +79,7 @@ class WritingTFRecord(object):
                     'data_type': data_type
                 }
                 data.append(meta)
-        """Assigning Class Weights for Imbalanced Dataset"""
+        """Class Weights for Imbalanced Dataset"""
         y = np.array([ex['label'] for ex in data])
         class_weights = class_weight.compute_class_weight("balanced", np.unique(y), y)
         class_weights = dict(enumerate(class_weights))
