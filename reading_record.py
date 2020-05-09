@@ -1,7 +1,6 @@
 import os
 import glob
 import tensorflow as tf
-import numpy as np
 
 
 def get_classes():
