@@ -113,7 +113,7 @@ class WritingTFRecord(object):
         return None
 
     def preprocess_data(self):
-        for d in ['train', 'validation', 'test']:
+        for d in ['validation', 'train']:
             data = self.load_dataset(data_type=d)
             labels = list(set([ex['label'] for ex in data]))
             for l in labels:
