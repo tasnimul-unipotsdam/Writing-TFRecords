@@ -73,6 +73,7 @@ class WritingTFRecord(object):
             list_image_fns = glob.glob(os.path.join(img_dir, l, '*'))
             for fn in list_image_fns:
                 img = cv2.imread(fn, cv2.IMREAD_COLOR)
+                img = cv2.resize(img, (64, 64))
                 meta = {
                     'image': img,
                     'label': l,
