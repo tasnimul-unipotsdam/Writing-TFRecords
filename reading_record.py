@@ -43,7 +43,7 @@ class DataLoader(object):
         label = tf.one_hot(record['label'], len(self.classes), dtype=tf.float32)
         return img, label
 
-    def agumentation(self, crop, label):
+    def augmentation(self, crop, label):
         crop = tf.image.random_flip_up_down(crop)
         crop = tf.image.random_flip_left_right(crop)
         crop = tf.image.rot90(crop)
@@ -54,8 +54,8 @@ class DataLoader(object):
         crop = crop / 255
         return crop, label
 
-    def val_aug(self, crop, label):
-        crop = crop/255
+    def validation_augmentation(self, crop, label):
+        crop = crop / 255
         return crop, label
 
     def load_dataset(self, label):
@@ -66,23 +66,13 @@ class DataLoader(object):
                                      num_parallel_calls=min(len(filenames), tf.data.experimental.AUTOTUNE))
         dataset = dataset.map(self.parse_record, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         if self.training == 'train':
-            dataset = dataset.map(self.agumentation)
-        else:
-            dataset = dataset.map(self.val_aug)
+            dataset = dataset.map(self.augmentation)
 
+        else:
+            dataset = dataset.map(self.validation_augmentation)
         dataset = dataset.shuffle(self.buffer, seed=self.seed)
         dataset = dataset.repeat()
         return dataset
-
-    def balanced_batch(self):
-        datasets = []
-        for cl in self.classes:
-            datasets.append(self.load_dataset(cl))
-        importance = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
-        sampled_dataset = tf.data.experimental.sample_from_datasets(datasets, weights=importance)
-        sampled_dataset = sampled_dataset.batch(self.batch_size)
-        sampled_dataset = sampled_dataset.prefetch(2)
-        return sampled_dataset
 
     def general_dataset(self):
 
@@ -93,9 +83,10 @@ class DataLoader(object):
                                      num_parallel_calls=min(len(filenames), tf.data.experimental.AUTOTUNE))
         dataset = dataset.map(self.parse_record, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         if self.training == 'train':
-            dataset = dataset.map(self.agumentation)
+            dataset = dataset.map(self.augmentation)
+
         else:
-            dataset = dataset.map(self.val_aug)
+            dataset = dataset.map(self.validation_augmentation)
         dataset = dataset.shuffle(self.buffer, seed=self.seed)
         dataset = dataset.repeat(1)
         dataset = dataset.batch(self.batch_size)
@@ -105,4 +96,3 @@ class DataLoader(object):
 if __name__ == '__main__':
     train_dataset = DataLoader("D:\\PROJECTS\\Writing-TFRecords\\records", training=True).general_dataset()
     validation_dataset = DataLoader("D:\\PROJECTS\\Writing-TFRecords\\records", training=False).general_dataset()
-
